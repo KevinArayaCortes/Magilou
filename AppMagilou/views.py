@@ -1,16 +1,18 @@
 from django.shortcuts import render, redirect
 from AppMagilou.forms import RegistroForm
+from AppMagilou.models import Producto
 
-def home(request):
-    return render(request, 'home.html')
+
 
 def car(request):
     return render(request, 'pago.html')
 
 def catalogo(request):
-    return render(request, 'catalogo.html')
+    producto = Producto.objects.all()
+    data = {'producto': producto }
+    return render(request, 'catalogo.html', data)
 
-def registro(request):
+def home(request):
     if request.method == 'POST':
         form = RegistroForm(request.POST)
         if form.is_valid():
@@ -19,5 +21,5 @@ def registro(request):
     else:
         form = RegistroForm()
 
-    return render(request, 'registro.html', {'form': form})
+    return render(request, 'home.html', {'form': form})
  

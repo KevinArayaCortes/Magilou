@@ -31,12 +31,38 @@
                         <a class="nav-link" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito" aria-controls="offcanvasCarrito">Carrito de Compras</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="/registro">Registro</a>
+                        <!-- Botón que activa el modal -->
+                        <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#registroModal">Registro</a>
                     </li>
                 </ul>
             </div>
         </div>
     </nav>
+
+    <!-- Modal de Registro Mejorado -->
+<!-- Modal de Registro -->
+<div class="modal fade" id="registroModal" tabindex="-1" aria-labelledby="registroModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content bg-dark text-white">
+            <div class="modal-header border-0">
+                <h5 class="modal-title text-center w-100" id="registroModalLabel">Registro de Usuario</h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal" aria-label="Close"></button>
+            </div>
+            <div class="modal-body">
+                <form method="POST">
+                    {% csrf_token %}
+                    <div class="px-2 py-3">
+                        {{ form.as_p }}
+                    </div>
+                    <button type="submit" class="btn btn-danger w-100 mt-3">Registrarse</button>
+                </form>
+            </div>
+        </div>
+    </div>
+</div>
+
+
+
     
 
     <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">

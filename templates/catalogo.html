@@ -1,3 +1,4 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -10,33 +11,36 @@
 
 
 <body>
-    {% if productos %}
+    {% if producto %}
     <div class="container my-5">
         <h1 class="text-center mb-4">Catálogo de Productos</h1>
-            <div class="row row-cols-1 row-cols-md-3 g-4">
-            <!-- Producto 1 -->
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for p in producto %}
             <div class="col">
-                {% for p in productos %}
                 <div class="card h-100">
-                <img src="https://via.placeholder.com/150" class="card-img-top" alt="Producto 1">
-                <div class="card-body">
-                    <h5 class="card-title">{{ p.nombre_producto }}</h5>
-                    <p class="card-text">{{ p.tipo_producto }}</p>
-                    <p class="card-text">{{ p.descripcion_producto }}</p>
-                    <p class="card-text">{{ p.precio_producto }}</p>
-                    <p class="card-text">{{ p.stock_producto }}</p>
-                </div>
-
-                {% endfor %}
-                {% endif %}
-
-                <div class="card-footer">
-                    <button class="btn btn-primary w-100">Agregar al carrito</button>
-                </div>
+                    <img src="">
+                    <div class="card-body">
+                        <h5 class="card-title">{{ p.nombre_producto }}</h5>
+                        <p class="card-text">
+                            Tipo: {{ p.tipo_producto }}<br>
+                            Descripción: {{ p.descripcion_producto }}<br>
+                            Precio: ${{ p.precio_producto }}<br>
+                            Stock: {{ p.stock_producto }}
+                        </p>
+                    </div>
+                    <div class="card-footer">
+                        <button class="btn btn-primary w-100">Agregar al carrito</button>
+                    </div>
                 </div>
             </div>
-            </div>
+            {% endfor %}
+        </div>
     </div>
-
+    {% else %}
+    <div class="container my-5">
+        <h2 class="text-center">No hay productos disponibles.</h2>
+    </div>
+    {% endif %}
 </body>
+
 </html>

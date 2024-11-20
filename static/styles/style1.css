@@ -85,3 +85,37 @@ carrousel {
     margin-right: 150px;
 }
 
+/* Estilo para campos del formulario */
+.modal-body form p {
+    margin-bottom: 1.5rem;
+}
+
+.modal-body form label {
+    font-weight: bold;
+    margin-bottom: 0.5rem;
+}
+
+.modal-body form input {
+    border-radius: 5px;
+    padding: 10px;
+    border: 1px solid #ccc;
+    background-color: #fff;
+    color: #000;
+    width: 100%;
+}
+
+/* Estilo del botón */
+.modal-body form .btn {
+    padding: 0.7rem;
+    font-size: 1rem;
+    font-weight: bold;
+}
+
+.btn-danger {
+    background-color: #800020; /* Rojo oscuro */
+    border: none;
+}
+
+.btn-danger:hover {
+    background-color: #a0002b; /* Rojo más claro */
+}
