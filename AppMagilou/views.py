@@ -19,7 +19,7 @@ def home(request):
     form = RegistroForm()  # Formulario de registro por defecto
 
     if request.method == 'POST':
-        action = request.POST.get('action')  # Determina si es registro o login
+        action = request.POST.get('action')  # Determina si es login, registro o logout
 
         if action == 'register':
             # Procesar registro
@@ -27,9 +27,9 @@ def home(request):
             if form.is_valid():
                 form.save()
                 messages.success(request, 'Registro exitoso. Ahora puedes iniciar sesión.')
-                return redirect('/')  # Redirige tras registro exitoso
+                return redirect('/')
             else:
-                messages.error(request, 'Hubo errores en el formulario de registro. Por favor, corrige y envía nuevamente.')
+                messages.error(request, 'Hubo errores en el formulario. Corrige y envía nuevamente.')
 
         elif action == 'login':
             # Procesar inicio de sesión
@@ -43,11 +43,18 @@ def home(request):
                     request.session['usuario_id'] = usuario.id_usuario
                     request.session['usuario_nombre'] = usuario.nombre
                     messages.success(request, f'Bienvenido, {usuario.nombre}!')
-                    return redirect('/')  # Redirige tras inicio de sesión exitoso
+                    return redirect('/')
                 else:
                     messages.error(request, 'Contraseña incorrecta.')
             except Usuario.DoesNotExist:
                 messages.error(request, 'El correo no está registrado.')
 
-    # Renderiza la página principal con el formulario
+        elif action == 'logout':
+            # Procesar cierre de sesión
+            if 'usuario_id' in request.session:
+                del request.session['usuario_id']
+                del request.session['usuario_nombre']
+                messages.success(request, 'Has cerrado sesión correctamente.')
+            return redirect('/')
+
     return render(request, 'home.html', {'form': form})
