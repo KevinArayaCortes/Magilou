@@ -1,0 +1,83 @@
+body {
+    background-color: #0A0A0A;
+    color: #F8F1E5;
+    font-family: Arial, sans-serif;
+    margin: 0;
+    padding: 0;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    min-height: 100vh;
+}
+
+.form-container {
+    background-color: #1F2326;
+    padding: 30px;
+    border-radius: 15px;
+    box-shadow: 0 4px 10px rgba(0, 0, 0, 0.5);
+    width: 90%;
+    max-width: 500px;
+    text-align: center;
+}
+
+.form-container h1 {
+    margin-bottom: 20px;
+    color: #F8F1E5;
+    font-size: 1.8em;
+}
+
+/* Grid para etiquetas y campos */
+.form-grid {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 15px;
+    text-align: left;
+}
+
+.form-grid label {
+    margin-bottom: 5px;
+    font-weight: bold;
+    display: block;
+}
+
+.form-grid input {
+    padding: 10px;
+    border-radius: 5px;
+    border: 1px solid #ccc;
+    font-size: 1em;
+    box-sizing: border-box;
+    width: 100%; /* Asegura que los campos se ajusten al contenedor */
+    background-color: #F8F1E5;
+    color: #0A0A0A;
+}
+
+/* Botón centrado */
+form button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    border-radius: 5px;
+    border: none;
+    background-color: #800020;
+    color: #F8F1E5;
+    font-weight: bold;
+    font-size: 1em;
+    cursor: pointer;
+    transition: background-color 0.3s, transform 0.2s;
+}
+
+form button:hover {
+    background-color: #68021b;
+    transform: scale(1.05);
+}
+
+/* Responsive para pantallas pequeñas */
+@media (max-width: 480px) {
+    .form-grid {
+        grid-template-columns: 1fr; /* Cambiar a una columna */
+    }
+
+    .form-grid label {
+        text-align: left;
+    }
+}

@@ -22,7 +22,7 @@ class ProductoAdmin(admin.ModelAdmin):
 
 # Configuración para Usuario
 class UsuarioAdmin(admin.ModelAdmin):
-    list_display = ('id_usuario', 'nombre', 'apellido', 'rut', 'correo', 'telefono')
+    list_display = ('id_usuario', 'nombre', 'apellido', 'rut', 'correo', 'telefono', 'contrasena')
     search_fields = ('nombre', 'apellido', 'rut', 'correo')
     list_filter = ('direccion',)
     ordering = ('apellido', 'nombre')

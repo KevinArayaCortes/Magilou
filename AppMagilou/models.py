@@ -9,7 +9,7 @@ class Usuario(models.Model):
     correo = models.EmailField(max_length=50, unique=True)
     direccion = models.CharField(max_length=100)
     telefono = models.CharField(max_length=20)
-
+    contrasena = models.CharField(max_length=255)
     class Meta:
         db_table = 'Usuario'
 
