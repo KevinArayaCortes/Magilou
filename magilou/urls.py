@@ -21,6 +21,6 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home),
     path('car/', views.car),
-    path('inicio-sesion', views.inicio_sesion),
+
     path('catalogo/', views.catalogo),
 ]
