@@ -13,7 +13,7 @@ class UsuarioAdmin(admin.ModelAdmin):
 # Personalización del modelo Producto
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('id_producto', 'nombre_producto', 'tipo_producto', 'precio_producto', 'stock_producto')
+    list_display = ('nombre_producto', 'precio_producto', 'stock_producto', 'imagen_producto')
     search_fields = ('nombre_producto', 'tipo_producto')
     list_filter = ('tipo_producto',)
     ordering = ('id_producto',)

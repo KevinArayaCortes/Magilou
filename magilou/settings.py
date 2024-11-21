@@ -42,6 +42,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'AppMagilou',
+    'storages'
 ]
 
 MIDDLEWARE = [
@@ -133,3 +134,18 @@ STATICFILES_DIRS = [os.path.join(BASE_DIR, 'static')]
 # https://docs.djangoproject.com/en/3.2/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
+
+
+# AWS S3 Configuración
+#PONER AQUI VARIABLE POR LAS ENVIADAS AL WSP <-----------------------------------------------
+#PONER AQUI VARIABLE POR LAS ENVIADAS AL WSP <-----------------------------------------------
+AWS_STORAGE_BUCKET_NAME = 'bucketsimg'
+AWS_S3_REGION_NAME = 'sa-east-1'  # Cambia a tu región
+
+# Opcional: Configuración avanzada
+AWS_QUERYSTRING_AUTH = False  # Desactiva los tokens en la URL (opcional)
+
+
+# Configuración para Django-Storages
+DEFAULT_FILE_STORAGE = 'storages.backends.s3boto3.S3Boto3Storage'
+MEDIA_URL = f'https://{AWS_STORAGE_BUCKET_NAME}.s3.amazonaws.com/'

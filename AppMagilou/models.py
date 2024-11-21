@@ -41,9 +41,10 @@ class Producto(models.Model):
     descripcion_producto = models.CharField(max_length=100)
     precio_producto = models.FloatField()
     stock_producto = models.IntegerField()
+    imagen_producto = models.ImageField(upload_to='productos/', blank=True, null=True)  # Se subirá al bucket S3
 
     class Meta:
-        managed = False
+        managed = True
         db_table = 'Producto'
 
 

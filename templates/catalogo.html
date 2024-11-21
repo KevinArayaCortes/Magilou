@@ -51,7 +51,7 @@
   <!-- Carrito Sidebar -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasCarritoLabel"style="color: #F8F1E5;">Carrito de Compras</h5>
+      <h5 class="offcanvas-title" id="offcanvasCarritoLabel" style="color: #F8F1E5;">Carrito de Compras</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
@@ -62,27 +62,25 @@
       <button class="btn btn-primary w-100 mt-3" onclick="location.href='/carrito/'">Ir a pagar</button>
     </div>
   </div>
+
   <div class="container my-5">
     <div class="row">
       <!-- Sidebar de filtros -->
       <div class="col-md-2">
-        <form method="get" action="" class="sticky-top" style="top: 20px;"> <!-- Hacer que los filtros se mantengan visibles al hacer scroll -->
-          <!-- Barra de búsqueda -->
+        <form method="get" action="" class="sticky-top" style="top: 20px;">
           <div class="mb-3">
             <label for="search" class="form-label" style="color: #F8F1E5;">Buscar productos:</label>
             <input type="text" name="q" id="search" class="form-control" placeholder="Buscar..." value="{{ request.GET.q|default:'' }}">
           </div>
-          <!-- Filtro por tipo -->
           <div class="mb-3">
-            <label for="tipo" class="form-label"style="color: #F8F1E5;">Filtrar por tipo:</label>
+            <label for="tipo" class="form-label" style="color: #F8F1E5;">Filtrar por tipo:</label>
             <select name="tipo" id="tipo" class="form-select">
               <option value="" {% if not request.GET.tipo %}selected{% endif %}>Todos los tipos</option>
               {% for tipo in tipos %}
-              <option value="{{ tipo }}" {% if request.GSET.tipo == tipo %}selected{% endif %}>{{ tipo }}</option>
+              <option value="{{ tipo }}" {% if request.GET.tipo == tipo %}selected{% endif %}>{{ tipo }}</option>
               {% endfor %}
             </select>
           </div>
-          <!-- Botón de búsqueda -->
           <button type="submit" class="btn btn-primary w-100">Aplicar filtros</button>
         </form>
       </div>
@@ -90,12 +88,17 @@
       <!-- Catálogo de productos -->
       <div class="col-md-10">
         {% if producto %}
-        <h1 class="text-center mb-4"style="color: #F8F1E5;">Catálogo de Productos</h1>
+        <h1 class="text-center mb-4" style="color: #F8F1E5;">Catálogo de Productos</h1>
         <div class="row row-cols-1 row-cols-md-3 g-4">
           {% for p in producto %}
           <div class="col">
             <div class="card h-100">
-              <img src="https://cdn-media.glamira.com/media/product/newgeneration/view/1/sku/rope4-75mm/alloycolour/yellow.jpg" class="card-img-top" alt="{{ p.nombre_producto }}">
+              {% if p.imagen_producto %}
+              <img src="{{ p.imagen_producto.url }}" class="card-img-top" alt="{{ p.nombre_producto }}">
+              {% else %}
+              <img src="/static/img/default-image.jpg" class="card-img-top" alt="Imagen no disponible">
+              {% endif %}
+              
               <div class="card-body">
                 <h5 class="card-title">{{ p.nombre_producto }}</h5>
                 <p class="card-text">
@@ -106,7 +109,9 @@
                 <p class="fw-bold">Precio: ${{ p.precio_producto }}</p>
               </div>
               <div class="card-footer text-center">
-                <button class="btn btn-primary agregar-carrito" data-id="{{ p.id_producto }}">Agregar al carrito</button>
+                <button class="btn btn-primary agregar-carrito" data-id="{{ p.id_producto }}">
+                  Agregar al carrito
+                </button>
               </div>
             </div>
           </div>
@@ -120,10 +125,6 @@
       </div>
     </div>
   </div>
-  
-  
-  
-  </main>
 
   <!-- Footer -->
   <footer class="bg-dark text-white py-4 mt-auto">
@@ -132,6 +133,87 @@
     </div>
   </footer>
 
+  <!-- Script -->
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+        const botonesAgregar = document.querySelectorAll(".agregar-carrito");
+        const listaCarrito = document.getElementById("carrito-lista");
+        const totalCarrito = document.getElementById("carrito-total");
 
-  
+        // Agregar producto al carrito
+        botonesAgregar.forEach(boton => {
+            boton.addEventListener("click", async (e) => {
+                const productoId = e.target.getAttribute("data-id");
+
+                try {
+                    const response = await fetch("/agregar_carrito/", {
+                        method: "POST",
+                        headers: {
+                            "Content-Type": "application/json",
+                            "X-CSRFToken": "{{ csrf_token }}"
+                        },
+                        body: JSON.stringify({ producto_id: productoId })
+                    });
+
+                    if (response.ok) {
+                        const data = await response.json();
+                        actualizarCarrito(data.carrito, data.total);
+                    } else {
+                        console.error("Error al agregar producto:", await response.text());
+                        alert("Error al agregar el producto al carrito.");
+                    }
+                } catch (error) {
+                    console.error("Error:", error);
+                    alert("Error al agregar el producto al carrito.");
+                }
+            });
+        });
+
+        // Eliminar producto del carrito
+        async function eliminarProducto(productoId) {
+            try {
+                const response = await fetch("/eliminar_carrito/", {
+                    method: "POST",
+                    headers: {
+                        "Content-Type": "application/json",
+                        "X-CSRFToken": "{{ csrf_token }}"
+                    },
+                    body: JSON.stringify({ producto_id: productoId })
+                });
+
+                if (response.ok) {
+                    const data = await response.json();
+                    actualizarCarrito(data.carrito, data.total);
+                } else {
+                    console.error("Error al eliminar producto:", await response.text());
+                    alert("Error al eliminar el producto del carrito.");
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                alert("Error al eliminar el producto del carrito.");
+            }
+        }
+
+        // Actualizar carrito en la interfaz
+        function actualizarCarrito(carrito, total) {
+            listaCarrito.innerHTML = "";
+
+            carrito.forEach(item => {
+                const li = document.createElement("li");
+                li.textContent = `${item.nombre} - $${item.precio} x ${item.cantidad}`;
+
+                const botonEliminar = document.createElement("button");
+                botonEliminar.textContent = "Eliminar";
+                botonEliminar.className = "btn btn-danger btn-sm ms-2";
+                botonEliminar.onclick = () => eliminarProducto(item.producto_id || item.id);
+                li.appendChild(botonEliminar);
+
+                listaCarrito.appendChild(li);
+            });
+
+            totalCarrito.textContent = `Total: $${total}`;
+        }
+    });
+  </script>
+</body>
 </html>
