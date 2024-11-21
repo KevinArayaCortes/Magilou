@@ -51,7 +51,7 @@
   <!-- Carrito Sidebar -->
   <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
     <div class="offcanvas-header">
-      <h5 class="offcanvas-title" id="offcanvasCarritoLabel">Carrito de Compras</h5>
+      <h5 class="offcanvas-title" id="offcanvasCarritoLabel"style="color: #F8F1E5;">Carrito de Compras</h5>
       <button type="button" class="btn-close" data-bs-dismiss="offcanvas"></button>
     </div>
     <div class="offcanvas-body">
@@ -62,40 +62,67 @@
       <button class="btn btn-primary w-100 mt-3" onclick="location.href='/carrito/'">Ir a pagar</button>
     </div>
   </div>
+  <div class="container my-5">
+    <div class="row">
+      <!-- Sidebar de filtros -->
+      <div class="col-md-2">
+        <form method="get" action="" class="sticky-top" style="top: 20px;"> <!-- Hacer que los filtros se mantengan visibles al hacer scroll -->
+          <!-- Barra de búsqueda -->
+          <div class="mb-3">
+            <label for="search" class="form-label" style="color: #F8F1E5;">Buscar productos:</label>
+            <input type="text" name="q" id="search" class="form-control" placeholder="Buscar..." value="{{ request.GET.q|default:'' }}">
+          </div>
+          <!-- Filtro por tipo -->
+          <div class="mb-3">
+            <label for="tipo" class="form-label"style="color: #F8F1E5;">Filtrar por tipo:</label>
+            <select name="tipo" id="tipo" class="form-select">
+              <option value="" {% if not request.GET.tipo %}selected{% endif %}>Todos los tipos</option>
+              {% for tipo in tipos %}
+              <option value="{{ tipo }}" {% if request.GSET.tipo == tipo %}selected{% endif %}>{{ tipo }}</option>
+              {% endfor %}
+            </select>
+          </div>
+          <!-- Botón de búsqueda -->
+          <button type="submit" class="btn btn-primary w-100">Aplicar filtros</button>
+        </form>
+      </div>
 
-  <!-- Catálogo de Productos -->
-  <main class="flex-grow-1">
-    <div class="container my-5">
-      {% if producto %}
-      <h1 class="text-center mb-4">Catálogo de Productos</h1>
-      <div class="row row-cols-1 row-cols-md-3 g-4">
-        {% for p in producto %}
-        <div class="col">
-          <div class="card h-100">
-            <img src="https://cdn-media.glamira.com/media/product/newgeneration/view/1/sku/rope4-75mm/alloycolour/yellow.jpg" class="card-img-top" alt="{{ p.nombre_producto }}">
-            <div class="card-body" style="padding-bottom: 0px;">
-              <h5 class="card-title">{{ p.nombre_producto }}</h5>
-              <p class="card-text">
-                <strong>Tipo:</strong> {{ p.tipo_producto }}<br>
-                <strong>Descripción:</strong> {{ p.descripcion_producto }}<br>
-                <strong>Stock:</strong> {{ p.stock_producto }}
-              </p>
-              <p class="fw-bold" style="margin: 0px;" >Precio: ${{ p.precio_producto }}</p>
-            </div>
-            <div class="card-footer" style="text-align: center;">
+      <!-- Catálogo de productos -->
+      <div class="col-md-10">
+        {% if producto %}
+        <h1 class="text-center mb-4"style="color: #F8F1E5;">Catálogo de Productos</h1>
+        <div class="row row-cols-1 row-cols-md-3 g-4">
+          {% for p in producto %}
+          <div class="col">
+            <div class="card h-100">
+              <img src="https://cdn-media.glamira.com/media/product/newgeneration/view/1/sku/rope4-75mm/alloycolour/yellow.jpg" class="card-img-top" alt="{{ p.nombre_producto }}">
+              <div class="card-body">
+                <h5 class="card-title">{{ p.nombre_producto }}</h5>
+                <p class="card-text">
+                  <strong>Tipo:</strong> {{ p.tipo_producto }}<br>
+                  <strong>Descripción:</strong> {{ p.descripcion_producto }}<br>
+                  <strong>Stock:</strong> {{ p.stock_producto }}
+                </p>
+                <p class="fw-bold">Precio: ${{ p.precio_producto }}</p>
+              </div>
+              <div class="card-footer text-center">
                 <button class="btn btn-primary agregar-carrito" data-id="{{ p.id_producto }}">Agregar al carrito</button>
-
+              </div>
             </div>
           </div>
+          {% endfor %}
         </div>
-        {% endfor %}
+        {% else %}
+        <div class="text-center my-5">
+          <h2>No hay productos disponibles.</h2>
+        </div>
+        {% endif %}
       </div>
-      {% else %}
-      <div class="text-center my-5">
-        <h2>No hay productos disponibles.</h2>
-      </div>
-      {% endif %}
     </div>
+  </div>
+  
+  
+  
   </main>
 
   <!-- Footer -->

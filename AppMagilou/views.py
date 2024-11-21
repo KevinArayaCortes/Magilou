@@ -13,8 +13,29 @@ def car(request):
     return render(request, 'pago.html')
 
 def catalogo(request):
+    query = request.GET.get('q', '')  # Término de búsqueda
+    tipo_filtro = request.GET.get('tipo', '')  # Filtro por tipo
+    
+    # Obtener todos los tipos de productos para el filtro
+    tipos = Producto.objects.values_list('tipo_producto', flat=True).distinct()
+    
+    # Filtrar productos según búsqueda y tipo
     producto = Producto.objects.all()
-    data = {'producto': producto }
+    if query:
+        producto = producto.filter(
+            nombre_producto__icontains=query
+        ) | producto.filter(
+            descripcion_producto__icontains=query
+        )
+    if tipo_filtro:
+        producto = producto.filter(tipo_producto=tipo_filtro)
+
+    data = {
+        'producto': producto,
+        'tipos': tipos,
+        'query': query,
+        'tipo_filtro': tipo_filtro,
+    }
     return render(request, 'catalogo.html', data)
 
 def home(request):
