@@ -1,34 +1,37 @@
 from django.contrib import admin
-from AppMagilou.models import CarroDeCompras, CarroProducto, Producto, Usuario
+from AppMagilou.models import CarroProducto, CarroDeCompras, Producto, Usuario
 
-# Configuración para CarroDeCompras
-class CarroDeComprasAdmin(admin.ModelAdmin):
-    list_display = ('id_carro', 'fecha', 'id_usuario', 'precio_total', 'estado', 'metodo_pago')
-    search_fields = ('id_carro', 'estado')
-    list_filter = ('estado', 'metodo_pago')
-    date_hierarchy = 'fecha'
+# Personalización del modelo Usuario
+@admin.register(Usuario)
+class UsuarioAdmin(admin.ModelAdmin):
+    list_display = ('id_usuario', 'nombre', 'apellido', 'rut', 'correo', 'telefono')
+    search_fields = ('nombre', 'apellido', 'rut', 'correo')
+    list_filter = ('direccion',)
+    ordering = ('id_usuario',)
 
-# Configuración para CarroProducto
-class CarroProductoAdmin(admin.ModelAdmin):
-    list_display = ('id_carro', 'id_producto', 'cantidad_producto')
-    search_fields = ('id_carro__id_carro', 'id_producto__nombre_producto')  # Uso de campos relacionados para búsqueda
 
-# Configuración para Producto
+# Personalización del modelo Producto
+@admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
     list_display = ('id_producto', 'nombre_producto', 'tipo_producto', 'precio_producto', 'stock_producto')
     search_fields = ('nombre_producto', 'tipo_producto')
     list_filter = ('tipo_producto',)
-    ordering = ('nombre_producto',)
+    ordering = ('id_producto',)
 
-# Configuración para Usuario
-class UsuarioAdmin(admin.ModelAdmin):
-    list_display = ('id_usuario', 'nombre', 'apellido', 'rut', 'correo', 'telefono', 'contrasena')
-    search_fields = ('nombre', 'apellido', 'rut', 'correo')
-    list_filter = ('direccion',)
-    ordering = ('apellido', 'nombre')
 
-# Registro de modelos en el admin
-admin.site.register(CarroDeCompras, CarroDeComprasAdmin)
-admin.site.register(CarroProducto, CarroProductoAdmin)
-admin.site.register(Producto, ProductoAdmin)
-admin.site.register(Usuario, UsuarioAdmin)
+# Personalización del modelo CarroDeCompras
+@admin.register(CarroDeCompras)
+class CarroDeComprasAdmin(admin.ModelAdmin):
+    list_display = ('id_carro', 'id_usuario', 'cantidad_productos', 'precio_total', 'estado', 'metodo_pago', 'fecha')
+    search_fields = ('id_usuario__nombre', 'id_usuario__apellido', 'estado', 'metodo_pago')
+    list_filter = ('estado', 'metodo_pago', 'fecha')
+    ordering = ('id_carro',)
+    date_hierarchy = 'fecha'
+
+
+# Personalización del modelo CarroProducto
+@admin.register(CarroProducto)
+class CarroProductoAdmin(admin.ModelAdmin):
+    list_display = ('id', 'id_carro', 'id_producto', 'cantidad_producto')
+    search_fields = ('id_carro__id_usuario__nombre', 'id_producto__nombre_producto')
+    ordering = ('id',)
