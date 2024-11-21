@@ -1,0 +1,50 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+</head>
+<body>
+    {% extends "home.html" %}
+
+    {% block content %}
+    <div class="container my-5">
+        <h1 class="text-center">Tu Carrito</h1>
+    
+        {% if carrito and productos_carrito %}
+        <table class="table table-striped mt-4">
+            <thead>
+                <tr>
+                    <th scope="col">Producto</th>
+                    <th scope="col">Precio</th>
+                    <th scope="col">Cantidad</th>
+                    <th scope="col">Subtotal</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for item in productos_carrito %}
+                <tr>
+                    <td>{{ item.id_producto.nombre_producto }}</td>
+                    <td>${{ item.id_producto.precio_producto }}</td>
+                    <td>{{ item.cantidad_producto }}</td>
+                    <td>${{ item.id_producto.precio_producto|floatformat:2|floatformat:"* item.cantidad_producto" }}</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+        <div class="text-end mt-3">
+            <h4>Total: ${{ carrito.precio_total }}</h4>
+        </div>
+        {% else %}
+        <div class="text-center my-5">
+            <h3>Tu carrito está vacío.</h3>
+            <a href="/" class="btn btn-primary mt-3">Volver al catálogo</a>
+        </div>
+        {% endif %}
+    </div>
+    {% endblock %}
+    
+
+</body>
+</html>

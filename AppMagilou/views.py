@@ -3,7 +3,9 @@ from AppMagilou.forms import RegistroForm
 from AppMagilou.models import Producto
 from django.contrib.auth.hashers import check_password
 from django.contrib import messages
-from AppMagilou.models import Usuario
+from AppMagilou.models import Usuario, CarroDeCompras, CarroProducto
+from django.http import JsonResponse
+from django.shortcuts import get_object_or_404
 
 
 
@@ -58,3 +60,4 @@ def home(request):
             return redirect('/')
 
     return render(request, 'home.html', {'form': form})
+

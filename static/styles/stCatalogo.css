@@ -1,0 +1,35 @@
+html, body {
+    height: 100%; /* Asegura que el cuerpo ocupe el 100% del alto de la ventana */
+    margin: 0; /* Elimina márgenes por defecto */
+}
+
+body {
+    display: flex;
+    flex-direction: column; /* Configura el cuerpo como un contenedor flex vertical */
+    min-height: 100vh; /* Garantiza que ocupe al menos toda la pantalla */
+    background-color: #0A0A0A;
+}
+
+main {
+    flex-grow: 1; /* Hace que el contenido principal ocupe el espacio restante */
+}
+
+
+#obj img {
+    width: 150px;
+}
+
+#obj h1 {
+    margin: 5px;
+    font-size: 20px;
+}
+
+
+.card-text{
+    font-size: 12px;
+    margin-bottom: -1px;
+}
+#pre{
+    font-size: 20px;
+    text-align: center;
+}

@@ -21,6 +21,7 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home),
     path('car/', views.car),
-
     path('catalogo/', views.catalogo),
+    path("agregar-al-carrito/<int:producto_id>/", views.agregar_al_carrito, name="agregar_al_carrito"),
+    path("vercarrito/", views.ver_carrito),
 ]
