@@ -9,6 +9,10 @@ carrousel {
 .carousel-inner img{
     height: 600px;
 }
+#logo{
+    width: 100px;
+    margin-right: 10px;
+}
 
 #sobreNosotros {
     display: flex;
@@ -94,7 +98,3 @@ carrousel {
     background-color: #a0002b; /* Rojo más claro */
 }
 
-#logo{
-    width: 100px;
-    margin-right: 10px;
-}
