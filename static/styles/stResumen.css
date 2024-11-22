@@ -1,5 +1,5 @@
 #logo{
-    width: 10px;
+    width: 100px;
     margin-right: 10px;
 }
 
@@ -24,4 +24,8 @@ footer {
     padding: 20px;
     text-align: center;
 }
+nav{
+    font-size: 18px;
+}
+
 
