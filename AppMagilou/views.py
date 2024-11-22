@@ -155,3 +155,47 @@ def mostrar_carrito(request):
         "productos": carrito_productos,
     })
 
+@csrf_exempt
+def eliminar_carrito(request):
+    if request.method == "POST":
+        # Obtener el ID del usuario desde la sesión
+        usuario_id = request.session.get('usuario_id')
+        if not usuario_id:
+            return JsonResponse({"error": "Usuario no autenticado"}, status=401)
+
+        # Parsear los datos enviados
+        data = json.loads(request.body)
+        producto_id = data.get("producto_id")
+
+        # Validar si el producto existe en el carrito del usuario
+        try:
+            carrito = CarroDeCompras.objects.get(id_usuario_id=usuario_id, estado="pendiente")
+            carro_producto = CarroProducto.objects.get(id_carro=carrito, id_producto_id=producto_id)
+        except (CarroDeCompras.DoesNotExist, CarroProducto.DoesNotExist):
+            return JsonResponse({"error": "Producto no encontrado en el carrito"}, status=404)
+
+        # Restar cantidad o eliminar producto
+        if carro_producto.cantidad_producto > 1:
+            carro_producto.cantidad_producto -= 1
+            carro_producto.save()
+        else:
+            carro_producto.delete()
+
+        # Actualizar el carrito
+        carrito.cantidad_productos -= 1
+        carrito.precio_total -= carro_producto.id_producto.precio_producto
+        carrito.save()
+
+        # Preparar datos del carrito para la respuesta
+        carrito_productos = CarroProducto.objects.filter(id_carro=carrito).select_related("id_producto")
+        productos = [
+            {
+                "nombre": cp.id_producto.nombre_producto,
+                "precio": cp.id_producto.precio_producto,
+                "cantidad": cp.cantidad_producto
+            }
+            for cp in carrito_productos
+        ]
+
+        return JsonResponse({"carrito": productos, "total": carrito.precio_total})
+    return JsonResponse({"error": "Método no permitido"}, status=405)
