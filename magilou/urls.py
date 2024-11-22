@@ -20,9 +20,10 @@ from AppMagilou import views
 urlpatterns = [
     path('admin/', admin.site.urls),
     path('', views.home),
-    path('car/', views.car),
-    path('catalogo/', views.catalogo),
-    path("agregar_carrito/", views.agregar_carrito),
-    path("eliminar_carrito/", views.eliminar_carrito, name="eliminar_carrito"),
-    path('mostrar_carrito/', views.mostrar_carrito),
+    path('catalogo/', views.catalogo, name='catalogo'),
+    path("mostrar_carrito/", views.mostrar_carrito, name="mostrar_carrito"),
+    path("eliminar_producto/<int:producto_id>/", views.eliminar_producto_carrito, name="eliminar_producto"),
+    path("actualizar_cantidad/<int:producto_id>/", views.actualizar_cantidad_producto, name="actualizar_cantidad"),
+    path("agregar_al_carrito/<int:producto_id>/", views.agregar_al_carrito, name="agregar_al_carrito"),
+
 ]

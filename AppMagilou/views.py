@@ -7,6 +7,7 @@ from datetime import date
 from AppMagilou.forms import RegistroForm
 from AppMagilou.models import Usuario, Producto, CarroDeCompras, CarroProducto
 import json
+from django.contrib.auth.decorators import login_required
 
 
 def home(request):
@@ -53,7 +54,7 @@ def home(request):
 
     return render(request, 'home.html', {'form': form})
 
-# Vista de catálogo
+
 def catalogo(request):
     query = request.GET.get('q', '')  # Término de búsqueda
     tipo_filtro = request.GET.get('tipo', '')  # Filtro por tipo
@@ -80,33 +81,88 @@ def catalogo(request):
     }
     return render(request, 'catalogo.html', data)
 
-# Vista del carrito de compras
-def car(request):
-    return render(request, 'pago.html')
 
-# Agregar producto al carrito
-@csrf_exempt
-def agregar_carrito(request):
+@login_required
+def mostrar_carrito(request):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return render(request, "home.html", {"error": "No hay usuario autenticado."})
+
+    try:
+        carrito = CarroDeCompras.objects.get(id_usuario_id=usuario_id, estado="pendiente")
+        carrito_productos = CarroProducto.objects.filter(id_carro=carrito).select_related("id_producto")
+
+        # Calcular el total del carrito
+        total = sum(producto.cantidad_producto * producto.id_producto.precio_producto for producto in carrito_productos)
+    except CarroDeCompras.DoesNotExist:
+        carrito_productos = []
+        carrito = None
+        total = 0
+
+    data = {
+        "carrito": carrito,
+        "productos": carrito_productos,
+        "total": total,
+    }
+    return render(request, "carrito.html", data)
+
+
+@login_required
+def eliminar_producto_carrito(request, producto_id):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        messages.error(request, "No hay usuario autenticado.")
+        return redirect("mostrar_carrito")
+
+    try:
+        carrito = CarroDeCompras.objects.get(id_usuario_id=usuario_id, estado="pendiente")
+        producto = get_object_or_404(CarroProducto, id_carro=carrito, id_producto=producto_id)
+        producto.delete()
+        messages.success(request, "Producto eliminado del carrito correctamente.")
+    except CarroDeCompras.DoesNotExist:
+        messages.error(request, "No se encontró un carrito pendiente.")
+    except CarroProducto.DoesNotExist:
+        messages.error(request, "El producto no está en el carrito.")
+
+    return redirect("mostrar_carrito")
+
+@login_required
+def actualizar_cantidad_producto(request, producto_id):
     if request.method == "POST":
-        # Obtener el ID del usuario desde la sesión
-        usuario_id = request.session.get('usuario_id')  # Asegúrate de que exista esta sesión en tu app
-        if not usuario_id:
-            return JsonResponse({"error": "Usuario no autenticado"}, status=401)
-
-        # Parsear los datos enviados
-        data = json.loads(request.body)
-        producto_id = data.get("producto_id")
-
-        # Validar si el producto existe
+        nueva_cantidad = request.POST.get("cantidad")
         try:
-            producto = Producto.objects.get(id_producto=producto_id)
-        except Producto.DoesNotExist:
-            return JsonResponse({"error": "Producto no encontrado"}, status=404)
+            usuario_id = request.session.get('usuario_id')
+            carrito = CarroDeCompras.objects.get(id_usuario_id=usuario_id, estado="pendiente")
+            producto = CarroProducto.objects.get(id_carro=carrito, id_producto=producto_id)
 
-        # Obtener o crear el carrito asociado al usuario
+            # Validar y actualizar la cantidad
+            nueva_cantidad = int(nueva_cantidad)
+            if nueva_cantidad <= 0:
+                producto.delete()  # Eliminar si la cantidad es cero o menos
+                messages.success(request, "Producto eliminado del carrito.")
+            else:
+                producto.cantidad_producto = nueva_cantidad
+                producto.save()
+                messages.success(request, "Cantidad actualizada correctamente.")
+
+        except (CarroDeCompras.DoesNotExist, CarroProducto.DoesNotExist):
+            messages.error(request, "Hubo un problema al actualizar el producto.")
+
+    return redirect("mostrar_carrito")
+
+@login_required
+def agregar_al_carrito(request, producto_id):
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        messages.error(request, "Debes iniciar sesión para agregar productos al carrito.")
+        return redirect("catalogo")
+
+    try:
+        producto = Producto.objects.get(id_producto=producto_id)
         carrito, creado = CarroDeCompras.objects.get_or_create(
-            id_usuario_id=usuario_id, estado="pendiente",
-            defaults={"fecha": date.today(), "cantidad_productos": 0, "precio_total": 0.0}
+            id_usuario_id=usuario_id,
+            estado="pendiente",
+            defaults={"fecha": date.today(), "cantidad_productos": 0, "precio_total": 0.0},
         )
 
         # Verificar si el producto ya está en el carrito
@@ -115,61 +171,23 @@ def agregar_carrito(request):
             defaults={"cantidad_producto": 1}
         )
         if not creado:
+            # Incrementar la cantidad si ya existe
             carro_producto.cantidad_producto += 1
             carro_producto.save()
 
         # Actualizar el carrito
-        carrito.cantidad_productos += 1
-        carrito.precio_total += producto.precio_producto
+        carrito.cantidad_productos = CarroProducto.objects.filter(id_carro=carrito).count()
+        carrito.precio_total = sum(
+            cp.cantidad_producto * cp.id_producto.precio_producto
+            for cp in CarroProducto.objects.filter(id_carro=carrito)
+        )
         carrito.save()
 
-        # Preparar datos del carrito para la respuesta
-        carrito_productos = CarroProducto.objects.filter(id_carro=carrito).select_related("id_producto")
-        productos = [
-            {
-                "nombre": cp.id_producto.nombre_producto,
-                "precio": cp.id_producto.precio_producto,
-                "cantidad": cp.cantidad_producto
-            }
-            for cp in carrito_productos
-        ]
+        messages.success(request, f"Producto '{producto.nombre_producto}' agregado al carrito.")
+    except Producto.DoesNotExist:
+        messages.error(request, "El producto no existe.")
 
-        return JsonResponse({"carrito": productos, "total": carrito.precio_total})
-    return JsonResponse({"error": "Método no permitido"}, status=405)
+    return redirect("catalogo")
 
-# Mostrar productos en el carrito
-def mostrar_carrito(request):
-    usuario_id = request.session.get('usuario_id')
-    if not usuario_id:
-        return render(request, "carrito.html", {"error": "No hay usuario autenticado."})
 
-    try:
-        carrito = CarroDeCompras.objects.get(id_usuario_id=usuario_id, estado="pendiente")
-        carrito_productos = CarroProducto.objects.filter(id_carro=carrito).select_related("id_producto")
-    except CarroDeCompras.DoesNotExist:
-        carrito_productos = []
-        carrito = None
 
-    return render(request, "carrito.html", {
-        "carrito": carrito,
-        "productos": carrito_productos,
-    })
-
-@csrf_exempt
-def eliminar_carrito(request):
-    if request.method == "POST":
-        producto_id = request.POST.get("id_producto")
-        carro_id = request.POST.get("id_carro")
-        
-        if not producto_id or not carro_id:
-            return JsonResponse({"error": "ID de producto o carro no proporcionado"}, status=400)
-        
-        try:
-            # Buscar el registro del producto en el carrito
-            carro_producto = CarroProducto.objects.get(id_producto=producto_id, id_carro=carro_id)
-            carro_producto.delete()
-            return JsonResponse({"message": "Producto eliminado correctamente"})
-        except CarroProducto.DoesNotExist:
-            return JsonResponse({"error": "Producto no encontrado en el carrito"}, status=404)
-
-    return JsonResponse({"error": "Método no permitido"}, status=405)

@@ -29,7 +29,7 @@
             <a class="nav-link" href="/catalogo/">Catálogo</a>
           </li>
           <li class="nav-item">
-            <a class="nav-link" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">Carrito</a>
+            <a class="nav-link active" href="/mostrar_carrito/">Carrito</a>
           </li>
           {% if request.session.usuario_id %}
           <li class="nav-item">
@@ -85,9 +85,22 @@
         </form>
       </div>
 
+      
+
+
       <!-- Catálogo de productos -->
       <div class="col-md-10">
+
         {% if producto %}
+        {% if messages %}
+        <div class="mt-3">
+            {% for message in messages %}
+                <div class="alert alert-{{ message.tags }}" role="alert">
+                    {{ message }}
+                </div>
+            {% endfor %}
+        </div>
+        {% endif %}
         <h1 class="text-center mb-4" style="color: #F8F1E5;">Catálogo de Productos</h1>
         <div class="row row-cols-1 row-cols-md-3 g-4">
           {% for p in producto %}
@@ -118,10 +131,10 @@
                 </div>
               </div>
               <div class="card-footer text-center">
-                <button class="btn btn-primary agregar-carrito" data-id="{{ p.id_producto }}">
+                <a href="{% url 'agregar_al_carrito' p.id_producto %}" class="btn btn-primary">
                   Agregar al carrito
-                </button>
-              </div>
+                </a>
+            </div>
             </div>
           </div>
           {% endfor %}
@@ -158,87 +171,7 @@
     </div>
   </footer>
 
-  <!-- Script -->
-  <script>
-    document.addEventListener("DOMContentLoaded", () => {
-        const botonesAgregar = document.querySelectorAll(".agregar-carrito");
-        const listaCarrito = document.getElementById("carrito-lista");
-        const totalCarrito = document.getElementById("carrito-total");
 
-        // Agregar producto al carrito
-        botonesAgregar.forEach(boton => {
-            boton.addEventListener("click", async (e) => {
-                const productoId = e.target.getAttribute("data-id");
-
-                try {
-                    const response = await fetch("/agregar_carrito/", {
-                        method: "POST",
-                        headers: {
-                            "Content-Type": "application/json",
-                            "X-CSRFToken": "{{ csrf_token }}"
-                        },
-                        body: JSON.stringify({ producto_id: productoId })
-                    });
-
-                    if (response.ok) {
-                        const data = await response.json();
-                        actualizarCarrito(data.carrito, data.total);
-                    } else {
-                        console.error("Error al agregar producto:", await response.text());
-                        alert("Error al agregar el producto al carrito.");
-                    }
-                } catch (error) {
-                    console.error("Error:", error);
-                    alert("Error al agregar el producto al carrito.");
-                }
-            });
-        });
-
-        // Eliminar producto del carrito
-        async function eliminarProducto(productoId) {
-            try {
-                const response = await fetch("/eliminar_carrito/", {
-                    method: "POST",
-                    headers: {
-                        "Content-Type": "application/json",
-                        "X-CSRFToken": "{{ csrf_token }}"
-                    },
-                    body: JSON.stringify({ producto_id: productoId })
-                });
-
-                if (response.ok) {
-                    const data = await response.json();
-                    actualizarCarrito(data.carrito, data.total);
-                } else {
-                    console.error("Error al eliminar producto:", await response.text());
-                    alert("Error al eliminar el producto del carrito.");
-                }
-            } catch (error) {
-                console.error("Error:", error);
-                alert("Error al eliminar el producto del carrito.");
-            }
-        }
-
-        // Actualizar carrito en la interfaz
-        function actualizarCarrito(carrito, total) {
-            listaCarrito.innerHTML = "";
-
-            carrito.forEach(item => {
-                const li = document.createElement("li");
-                li.textContent = `${item.nombre} - $${item.precio} x ${item.cantidad}`;
-
-                const botonEliminar = document.createElement("button");
-                botonEliminar.textContent = "Eliminar";
-                botonEliminar.className = "btn btn-danger btn-sm ms-2";
-                botonEliminar.onclick = () => eliminarProducto(item.producto_id || item.id);
-                li.appendChild(botonEliminar);
-
-                listaCarrito.appendChild(li);
-            });
-            totalCarrito.textContent = `Total: $${total}`;
-        }
-    });
-  </script>
 
 </body>
 </html>

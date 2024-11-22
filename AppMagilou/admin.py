@@ -4,7 +4,7 @@ from AppMagilou.models import CarroProducto, CarroDeCompras, Producto, Usuario
 # Personalización del modelo Usuario
 @admin.register(Usuario)
 class UsuarioAdmin(admin.ModelAdmin):
-    list_display = ('id_usuario', 'nombre', 'apellido', 'rut', 'correo', 'telefono')
+    list_display = ('id_usuario', 'nombre', 'apellido', 'rut', 'correo', 'telefono','contrasena')
     search_fields = ('nombre', 'apellido', 'rut', 'correo')
     list_filter = ('direccion',)
     ordering = ('id_usuario',)
