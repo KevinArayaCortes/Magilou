@@ -8,7 +8,7 @@ from datetime import date
 from AppMagilou.forms import RegistroForm
 from AppMagilou.models import Usuario, Producto, CarroDeCompras, CarroProducto
 import json
-from django.contrib.auth.decorators import login_required
+
 from decimal import Decimal
 
 
@@ -84,7 +84,7 @@ def catalogo(request):
     return render(request, 'catalogo.html', data)
 
 
-@login_required
+
 def mostrar_carrito(request):
     usuario_id = request.session.get('usuario_id')
     if not usuario_id:
@@ -109,7 +109,7 @@ def mostrar_carrito(request):
     return render(request, "carrito.html", data)
 
 
-@login_required
+
 def eliminar_producto_carrito(request, producto_id):
     usuario_id = request.session.get('usuario_id')
     if not usuario_id:
@@ -128,7 +128,7 @@ def eliminar_producto_carrito(request, producto_id):
 
     return redirect("mostrar_carrito")
 
-@login_required
+
 def actualizar_cantidad_producto(request, producto_id):
     if request.method == "POST":
         nueva_cantidad = request.POST.get("cantidad")
@@ -152,7 +152,7 @@ def actualizar_cantidad_producto(request, producto_id):
 
     return redirect("mostrar_carrito")
 
-@login_required
+
 def agregar_al_carrito(request, producto_id):
     usuario_id = request.session.get('usuario_id')
     if not usuario_id:
@@ -191,7 +191,7 @@ def agregar_al_carrito(request, producto_id):
 
     return redirect("catalogo")
 
-@login_required
+
 def resumen_carrito(request, id_carro):
     carrito = get_object_or_404(CarroDeCompras, pk=id_carro)
     productos = CarroProducto.objects.filter(id_carro=carrito)
@@ -210,7 +210,7 @@ def resumen_carrito(request, id_carro):
         'total': total,  # Total corregido
     })
 
-@login_required
+
 def finalizar_compra(request, id_carro):
     if request.method == 'POST':
         metodo_pago = request.POST.get('metodo_pago')
