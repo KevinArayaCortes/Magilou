@@ -36,12 +36,6 @@ main {
     text-align: center;
 }
 
-.offcanvas-title, .form-label{
-    color: #F8F1E5;
-}
-
-/* Ajustar el footer */
-
   /* Ajustes para las tarjetas */
 .card-title {
     font-weight: bold;
@@ -82,4 +76,7 @@ main {
     max-height: 100px; /* Limita la altura máxima del contenido expandido */
     overflow-y: auto; /* Habilita el desplazamiento si el contenido es muy largo */
 }
-  
+#logo{
+    width: 100px;
+    margin-right: 10px;
+}

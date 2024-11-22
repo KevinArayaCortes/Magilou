@@ -1,3 +1,4 @@
+from gettext import translation
 from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.hashers import check_password
@@ -8,6 +9,7 @@ from AppMagilou.forms import RegistroForm
 from AppMagilou.models import Usuario, Producto, CarroDeCompras, CarroProducto
 import json
 from django.contrib.auth.decorators import login_required
+from decimal import Decimal
 
 
 def home(request):
@@ -189,5 +191,48 @@ def agregar_al_carrito(request, producto_id):
 
     return redirect("catalogo")
 
+@login_required
+def resumen_carrito(request, id_carro):
+    carrito = get_object_or_404(CarroDeCompras, pk=id_carro)
+    productos = CarroProducto.objects.filter(id_carro=carrito)
+    usuario = carrito.id_usuario
+
+    # Calcular el total correctamente, asegurando la precisión con Decimal
+    total = sum(
+        Decimal(producto.cantidad_producto) * Decimal(producto.id_producto.precio_producto)
+        for producto in productos
+    )
+
+    return render(request, 'resumen.html', {
+        'carrito': carrito,
+        'productos': productos,
+        'usuario': usuario,
+        'total': total,  # Total corregido
+    })
+
+@login_required
+def finalizar_compra(request, id_carro):
+    if request.method == 'POST':
+        metodo_pago = request.POST.get('metodo_pago')
+        carrito = get_object_or_404(CarroDeCompras, pk=id_carro)
+        productos = CarroProducto.objects.filter(id_carro=carrito)
+
+        # Actualizar estado del carrito
+        carrito.estado = 'Finalizado'
+        carrito.metodo_pago = metodo_pago
+        carrito.save()
+
+        # Reducir stock de productos
+        for item in productos:
+            producto = item.id_producto
+            if producto.stock_producto >= item.cantidad_producto:
+                producto.stock_producto -= item.cantidad_producto
+                producto.save()
+            else:
+                messages.error(request, f'No hay suficiente stock para el producto {producto.nombre_producto}')
+                return redirect('resumen_carrito', id_carro=id_carro)
+
+        messages.success(request, 'Compra finalizada con éxito.')
+        return redirect('catalogo')  # Redirige al catálogo u otra página después de finalizar
 
 

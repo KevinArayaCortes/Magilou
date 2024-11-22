@@ -27,7 +27,7 @@
                         <a class="nav-link" href="/catalogo">Catálogo</a>
                     </li>
                     <li class="nav-item">
-                        <a class="nav-link" href="#" data-bs-toggle="offcanvas" data-bs-target="#offcanvasCarrito">Carrito</a>
+                        <a class="nav-link active" href="/mostrar_carrito/">Carrito</a>
                     </li>
                     {% if request.session.usuario_id %}
                         <li class="nav-item">
@@ -129,20 +129,6 @@
 
 
 
-    <div class="offcanvas offcanvas-start" tabindex="-1" id="offcanvasCarrito" aria-labelledby="offcanvasCarritoLabel">
-        <div class="offcanvas-header">
-            <h5 class="offcanvas-title" id="offcanvasCarritoLabel">Carrito de Compras</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="offcanvas" aria-label="Close"></button>
-        </div>
-        <div class="offcanvas-body">
-            <div id="obj">
-                <h1>Cadena plata</h1>
-                <img src="https://cdnx.jumpseller.com/aurus/image/46209515/thumb/1000/1000?1709828044" alt="jy1">
-                <p>Precio: $30.000</p>
-            </div>
-        </div>
-        <button onclick="location.href='../car/'">Ir a pagar!</button>
-    </div>
 
     <div id="carrousel">
         <div id="carouselExampleAutoplaying" class="carousel slide" data-bs-ride="carousel">

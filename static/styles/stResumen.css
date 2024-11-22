@@ -1,0 +1,27 @@
+#logo{
+    width: 10px;
+    margin-right: 10px;
+}
+
+html, body {
+    height: 100%;
+    margin: 0;
+    display: flex;
+    flex-direction: column;
+    background-color: #0A0A0A;
+    color: #F8F1E5;
+}
+
+body > .container {
+    flex: 1;
+
+}
+
+footer {
+    flex-shrink: 0; /* El footer siempre estará al final */
+    background-color: #343a40; /* Fondo oscuro */
+    color: #fff;
+    padding: 20px;
+    text-align: center;
+}
+

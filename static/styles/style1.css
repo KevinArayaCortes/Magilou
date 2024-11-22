@@ -40,43 +40,6 @@ carrousel {
 
 }
 
-
-#offcanvasCarrito {
-    text-align: center;
-    background-color: #F8F1E5;
-    width: 300px;
-    justify-content: center;
-}
-
-#offcanvasCarrito button {
-    width: 100%;
-    background-color:#800020;
-    height: 50px;
-    border-color: rgb(255, 255, 255);
-    color: #F8F1E5;
-}
-
-#offcanvasCarrito button:hover {
-    background-color:#68021b;
-}
-
-#obj {
-    width: 100%;
-    background-color:#800020;
-    text-align: center;
-    padding: 10px;
-    border-radius: 10px;
-    color: #F8F1E5;
-}
-
-#obj img {
-    width: 150px;
-}
-
-#obj h1 {
-    font-size: 20px;
-}
-
 #ubi {
     text-align: center;
     background-color: #1F2326;

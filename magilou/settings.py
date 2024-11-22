@@ -139,6 +139,7 @@ DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 # AWS S3 Configuración
 #PONER AQUI VARIABLE POR LAS ENVIADAS AL WSP <-----------------------------------------------
 #PONER AQUI VARIABLE POR LAS ENVIADAS AL WSP <-----------------------------------------------
+
 AWS_STORAGE_BUCKET_NAME = 'bucketsimg'
 AWS_S3_REGION_NAME = 'sa-east-1'  # Cambia a tu región
 
