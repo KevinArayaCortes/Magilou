@@ -39,3 +39,47 @@ main {
 .offcanvas-title, .form-label{
     color: #F8F1E5;
 }
+
+/* Ajustar el footer */
+
+  /* Ajustes para las tarjetas */
+.card-title {
+    font-weight: bold;
+    font-size: 1.25rem;
+}
+  
+.collapse {
+    transition: all 0.3s ease-in-out;
+}
+  
+.collapse p {
+    margin-bottom: 0.5rem;
+}
+  
+.btn-light {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    gap: 0.5rem;
+    color: #000;
+    font-weight: bold;
+    border-color: #ddd;
+}
+  
+.btn-light i {
+    transition: transform 0.3s ease;
+}
+  
+.btn-light[aria-expanded="true"] i {
+    transform: rotate(180deg);
+}
+
+.card {
+    height: 100%; /* Fuerza la altura completa */
+}
+  
+.collapse {
+    max-height: 100px; /* Limita la altura máxima del contenido expandido */
+    overflow-y: auto; /* Habilita el desplazamiento si el contenido es muy largo */
+}
+  
