@@ -13,10 +13,10 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <img src="/static/img/logo.png" alt="logo" id="logo" width="100px" >
-            <a class="navbar-brand" href="#">Magilou Joyas</a>
+            <img src="/static/img/logo.png" alt="logo" id="logo" width="100px">
+            <a class="navbar-brand" href="../">Magilou Joyas</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-              <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
@@ -31,20 +31,29 @@
                     </li>
                     {% if request.session.usuario_id %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nombre }}</a>
+                            <!-- Enlace al perfil -->
+                            <a class="nav-link" href="{% url 'perfil' %}">
+                                <i class="bi bi-person-circle"></i> {{ request.session.usuario_nombre }}
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <form method="POST" class="d-inline">
+                            <form method="POST" action="{% url 'cerrar_sesion' %}" class="d-inline">
                                 {% csrf_token %}
-                                <input type="hidden" name="action" value="logout">
                                 <button type="submit" class="nav-link btn btn-link text-decoration-none">Cerrar Sesión</button>
                             </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                <i class="bi bi-person-circle"></i> Iniciar Sesión
+                            </a>
                         </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+    
 
     <div class="container my-5">
         <h1 class="text-center mb-4">Resumen de Compra</h1>
@@ -81,9 +90,14 @@
                             <tr>
                                 <td>{{ producto.id_producto.nombre_producto }}</td>
                                 <td>{{ producto.cantidad_producto }}</td>
-                                <td>${{ producto.id_producto.precio_producto|floatformat:2 }}</td>
+                                <td>${{ producto.id_producto.precio_producto|floatformat:0 }}</td>
                             </tr>
                         {% endfor %}
+
+                        <tr>
+                            <td colspan="2"><strong>Total:</strong></td>
+                            <td><strong>${{ total }}</strong></td>
+                        </tr>
                     </tbody>
                     
                     

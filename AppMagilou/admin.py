@@ -9,14 +9,16 @@ class UsuarioAdmin(admin.ModelAdmin):
     list_filter = ('direccion',)
     ordering = ('id_usuario',)
 
-
-# Personalización del modelo Producto
 @admin.register(Producto)
 class ProductoAdmin(admin.ModelAdmin):
-    list_display = ('nombre_producto', 'precio_producto', 'stock_producto', 'imagen_producto')
-    search_fields = ('nombre_producto', 'tipo_producto')
+    list_display = ('nombre_producto', 'tipo_producto', 'descripcion_producto','precio_producto_formateado', 'stock_producto', 'imagen_producto')
+    search_fields = ('nombre_producto', 'tipo_producto','descripcion_producto')
     list_filter = ('tipo_producto',)
     ordering = ('id_producto',)
+
+    def precio_producto_formateado(self, obj):
+        return f"${obj.precio_producto:,.0f}".replace(",", ".")
+    precio_producto_formateado.short_description = 'Precio'
 
 
 # Personalización del modelo CarroDeCompras

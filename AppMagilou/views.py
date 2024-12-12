@@ -3,11 +3,12 @@ from django.shortcuts import render, redirect, get_object_or_404
 from django.http import JsonResponse
 from django.contrib.auth.hashers import check_password
 from django.contrib import messages
-from django.views.decorators.csrf import csrf_exempt
 from datetime import date
 from AppMagilou.forms import RegistroForm
 from AppMagilou.models import Usuario, Producto, CarroDeCompras, CarroProducto
 import json
+from django.contrib.auth import logout as auth_logout
+from datetime import datetime
 
 from decimal import Decimal
 
@@ -75,6 +76,10 @@ def catalogo(request):
     if tipo_filtro:
         producto = producto.filter(tipo_producto=tipo_filtro)
 
+    # Formatear los precios a formato sin símbolo de peso y con coma como separador de miles
+    for prod in producto:
+        prod.precio_formateado = f"{prod.precio_producto:,.0f}".replace(",", ".")
+    
     data = {
         'producto': producto,
         'tipos': tipos,
@@ -85,6 +90,7 @@ def catalogo(request):
 
 
 
+# Vista para mostrar el carrito
 def mostrar_carrito(request):
     usuario_id = request.session.get('usuario_id')
     if not usuario_id:
@@ -95,20 +101,21 @@ def mostrar_carrito(request):
         carrito_productos = CarroProducto.objects.filter(id_carro=carrito).select_related("id_producto")
 
         # Calcular el total del carrito
-        total = sum(producto.cantidad_producto * producto.id_producto.precio_producto for producto in carrito_productos)
+        total = sum(Decimal(producto.cantidad_producto) * Decimal(producto.id_producto.precio_producto) for producto in carrito_productos)
+        
+        # Formatear el total con el formato chileno (con puntos como separador de miles)
+        total_formateado = f"${total:,.0f}".replace(",", ".")  # Formato chileno
     except CarroDeCompras.DoesNotExist:
         carrito_productos = []
         carrito = None
-        total = 0
+        total_formateado = "$0"  # Valor predeterminado si no se encuentra el carrito
 
     data = {
         "carrito": carrito,
         "productos": carrito_productos,
-        "total": total,
+        "total": total_formateado,  # Pasar el total ya formateado
     }
     return render(request, "carrito.html", data)
-
-
 
 def eliminar_producto_carrito(request, producto_id):
     usuario_id = request.session.get('usuario_id')
@@ -191,7 +198,6 @@ def agregar_al_carrito(request, producto_id):
 
     return redirect("catalogo")
 
-
 def resumen_carrito(request, id_carro):
     carrito = get_object_or_404(CarroDeCompras, pk=id_carro)
     productos = CarroProducto.objects.filter(id_carro=carrito)
@@ -203,13 +209,15 @@ def resumen_carrito(request, id_carro):
         for producto in productos
     )
 
+    # Formatear el total y los precios a formato chileno (sin coma extra)
+    total_formateado = f"{total:,.0f}".replace(",", ".")  # Se usa punto como separador de miles
+
     return render(request, 'resumen.html', {
         'carrito': carrito,
         'productos': productos,
         'usuario': usuario,
-        'total': total,  # Total corregido
+        'total': total_formateado,  # Total corregido
     })
-
 
 def finalizar_compra(request, id_carro):
     if request.method == 'POST':
@@ -217,9 +225,17 @@ def finalizar_compra(request, id_carro):
         carrito = get_object_or_404(CarroDeCompras, pk=id_carro)
         productos = CarroProducto.objects.filter(id_carro=carrito)
 
-        # Actualizar estado del carrito
+        # Calcular el total del carrito antes de finalizar
+        total = sum(
+            Decimal(item.cantidad_producto) * Decimal(item.id_producto.precio_producto)
+            for item in productos
+        )
+        
+        # Actualizar el precio total en el carrito
+        carrito.precio_total = total
         carrito.estado = 'Finalizado'
         carrito.metodo_pago = metodo_pago
+        carrito.fecha = date.today()  # Registrar la fecha actual
         carrito.save()
 
         # Reducir stock de productos
@@ -236,3 +252,72 @@ def finalizar_compra(request, id_carro):
         return redirect('catalogo')  # Redirige al catálogo u otra página después de finalizar
 
 
+
+
+
+def perfil(request):
+    # Recuperar el usuario desde la sesión
+    usuario_id = request.session.get('usuario_id')
+    if not usuario_id:
+        return redirect('login')
+
+    # Obtener el usuario
+    usuario = Usuario.objects.get(id_usuario=usuario_id)
+
+    # Obtener los carritos finalizados del usuario
+    carritos = CarroDeCompras.objects.filter(id_usuario_id=usuario_id, estado='Finalizado')
+
+    # Filtrado por fecha
+    fecha_inicio = request.GET.get('fecha_inicio')
+    fecha_fin = request.GET.get('fecha_fin')
+    
+    if fecha_inicio:
+        carritos = carritos.filter(fecha__gte=datetime.strptime(fecha_inicio, '%Y-%m-%d'))
+    if fecha_fin:
+        carritos = carritos.filter(fecha__lte=datetime.strptime(fecha_fin, '%Y-%m-%d'))
+
+
+    # Recopilar los detalles de cada carrito y sus productos
+    ventas = []
+    for carrito in carritos:
+        productos = CarroProducto.objects.filter(id_carro=carrito).select_related('id_producto')
+
+        # Calcular el total de cada carrito
+        total = sum(Decimal(item.cantidad_producto) * Decimal(item.id_producto.precio_producto) for item in productos)
+
+        # Preparar detalles de los productos
+        detalles_productos = [
+            {
+                'nombre': producto.id_producto.nombre_producto,
+                'cantidad': producto.cantidad_producto,
+                'precio': producto.id_producto.precio_producto,
+                'subtotal': Decimal(producto.cantidad_producto) * Decimal(producto.id_producto.precio_producto),
+                'imagen': producto.id_producto.imagen_producto.url if producto.id_producto.imagen_producto else None
+            }
+            for producto in productos
+        ]
+
+        ventas.append({
+            'fecha': carrito.fecha,
+            'estado': carrito.estado,
+            'cantidad': carrito.cantidad_productos,
+            'metodo_pago': carrito.metodo_pago,
+            'precio_total': total,
+            'productos': detalles_productos
+        })
+
+    # Pasar los datos a la plantilla
+    data = {
+        'usuario': usuario,
+        'ventas': ventas,
+    }
+
+    return render(request, "perfil.html", data)
+
+
+
+def cerrar_sesion(request):
+    # Eliminar la sesión
+    auth_logout(request)
+    # Redirigir al inicio
+    return redirect('/')

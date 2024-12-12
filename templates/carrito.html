@@ -14,10 +14,10 @@
 <body>
     <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
         <div class="container">
-            <img src="/static/img/logo.png" alt="logo" id="logo" width="100px" >
-            <a class="navbar-brand" href="#">Magilou Joyas</a>
+            <img src="/static/img/logo.png" alt="logo" id="logo" width="100px">
+            <a class="navbar-brand" href="../">Magilou Joyas</a>
             <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav">
-              <span class="navbar-toggler-icon"></span>
+                <span class="navbar-toggler-icon"></span>
             </button>
             <div class="collapse navbar-collapse" id="navbarNav">
                 <ul class="navbar-nav ms-auto">
@@ -32,24 +32,34 @@
                     </li>
                     {% if request.session.usuario_id %}
                         <li class="nav-item">
-                            <a class="nav-link" href="#"><i class="bi bi-person-circle"></i> {{ request.session.usuario_nombre }}</a>
+                            <!-- Enlace al perfil -->
+                            <a class="nav-link" href="{% url 'perfil' %}">
+                                <i class="bi bi-person-circle"></i> {{ request.session.usuario_nombre }}
+                            </a>
                         </li>
                         <li class="nav-item">
-                            <form method="POST" class="d-inline">
+                            <form method="POST" action="{% url 'cerrar_sesion' %}" class="d-inline">
                                 {% csrf_token %}
-                                <input type="hidden" name="action" value="logout">
                                 <button type="submit" class="nav-link btn btn-link text-decoration-none">Cerrar Sesión</button>
                             </form>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="#" data-bs-toggle="modal" data-bs-target="#loginModal">
+                                <i class="bi bi-person-circle"></i> Iniciar Sesión
+                            </a>
                         </li>
                     {% endif %}
                 </ul>
             </div>
         </div>
     </nav>
+    
+
 
     <div class="container my-5">
         <h1 class="text-center mb-4">Carrito de Compras</h1>
-
+    
         {% if messages %}
             <div class="mt-4">
                 {% for message in messages %}
@@ -59,7 +69,7 @@
                 {% endfor %}
             </div>
         {% endif %}
-
+    
         {% if carrito %}
         <div class="card mb-4">
             <div class="card-header">
@@ -96,7 +106,9 @@
                                         <button type="submit" class="btn btn-primary btn-sm ms-2">Actualizar</button>
                                     </form>
                                 </td>
-                                <td>${{ producto.id_producto.precio_producto }}</td>
+                                <td>${{ producto.id_producto.precio_producto|floatformat:0|add:""|default_if_none:"0" }}</td>
+
+
                                 <td>
                                     <a href="{% url 'eliminar_producto' producto.id_producto.id_producto %}" 
                                        class="btn btn-danger btn-sm"
@@ -110,7 +122,7 @@
                 </table>
             </div>
             <div class="card-footer text-end">
-                <h5>Total: ${{ total }}</h5>
+                <h5>Total: {{ total }}</h5>
             </div>
         </div>
     
@@ -125,6 +137,7 @@
             </div>
         {% endif %}
     </div>
+    
 
     <footer class="bg-dark text-white py-4">
         <div class="container">

@@ -6,7 +6,7 @@
 #   * Remove managed = False lines if you wish to allow Django to create, modify, and delete the table
 # Feel free to rename the models, but don't rename db_table values or field names.
 from django.db import models
-
+from decimal import Decimal
 
 class CarroProducto(models.Model):
     id = models.BigAutoField(primary_key=True)
@@ -39,13 +39,21 @@ class Producto(models.Model):
     nombre_producto = models.CharField(max_length=20)
     tipo_producto = models.CharField(max_length=20)
     descripcion_producto = models.CharField(max_length=100)
-    precio_producto = models.FloatField()
+    precio_producto = models.DecimalField(max_digits=12, decimal_places=0)  # Máximo 12 dígitos, sin decimales
     stock_producto = models.IntegerField()
     imagen_producto = models.ImageField(upload_to='productos/', blank=True, null=True)  # Se subirá al bucket S3
+
+    def format_precio(self):
+        return f"${self.precio_producto:,.0f}".replace(",", ".")  # Formato chileno
+
+    def __str__(self):
+        return f"{self.nombre_producto} - {self.format_precio()}"
 
     class Meta:
         managed = True
         db_table = 'Producto'
+
+
 
 
 class Usuario(models.Model):
