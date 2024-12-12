@@ -55,7 +55,6 @@
         </div>
     </nav>
     
-
     <div class="container my-5">
         <div class="card mb-4">
             <div class="card-header text-center bg-dark text-white">
@@ -64,38 +63,38 @@
         </div>
         <div class="card" id="datos">
             <div class="card-body">
-                <p><strong>RUT:</strong> {{ usuario.rut }}</p>
-                <p><strong>Nombre:</strong> {{ usuario.nombre }} {{ usuario.apellido }}</p>
-                <p><strong>Correo:</strong> {{ usuario.correo }}</p>
-                <p><strong>Dirección:</strong> {{ usuario.direccion }}</p>
-                <p><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
+                <p class="mb-3"><strong>RUT:</strong> {{ usuario.rut }}</p>
+                <p class="mb-3"><strong>Nombre:</strong> {{ usuario.nombre }} {{ usuario.apellido }}</p>
+                <p class="mb-3"><strong>Correo:</strong> {{ usuario.correo }}</p>
+                <p class="mb-3"><strong>Dirección:</strong> {{ usuario.direccion }}</p>
+                <p class="mb-3"><strong>Teléfono:</strong> {{ usuario.telefono }}</p>
             </div>
         </div>
     
-        <!-- Fila para organizar los filtros a la izquierda y el historial a la derecha -->
         <div class="row">
-            <!-- Columna para el formulario de búsqueda -->
             <div class="col-md-4">
                 <div class="card mb-4">
                     <div class="card-body">
                         <form id="comprasForm" method="GET">
                             <div class="card-header bg-light d-flex justify-content-between align-items-center">
                                 <h5 class="mb-0">Buscar Compras</h5>
-                                <button type="reset" class="btn btn-link text-secondary p-0 ml-2">
+                                <!-- Botón para resetear filtros -->
+                                <a href="{% url 'perfil' %}" class="btn btn-link text-secondary p-0 ml-2" title="Restablecer filtros">
                                     <i class="bi bi-arrow-repeat" style="font-size: 1.5rem;"></i>
-                                </button>
+                                </a>
                             </div>
                             <div class="row">
                                 <!-- Buscar por fecha -->
                                 <div class="col-md-12 mb-3">
                                     <label for="fecha_inicio">Fecha de compra (desde):</label>
-                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ request.GET.fecha_inicio }}">
+                                    <input type="date" class="form-control" id="fecha_inicio" name="fecha_inicio" value="{{ request.GET.fecha_inicio|default:'' }}">
                                 </div>
                                 <div class="col-md-12 mb-3">
                                     <label for="fecha_fin">Fecha de compra (hasta):</label>
-                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ request.GET.fecha_fin }}">
+                                    <input type="date" class="form-control" id="fecha_fin" name="fecha_fin" value="{{ request.GET.fecha_fin|default:'' }}">
                                 </div>
                             </div>
+                            <!-- Botón para buscar -->
                             <button type="submit" class="btn btn-dark w-100">Buscar</button>
                         </form>
                     </div>
@@ -104,7 +103,7 @@
     
             <!-- Columna para el historial de compras -->
             <div class="col-md-8">
-                <div class="card mt-4">
+                <div class="card">
                     <div class="card-header bg-dark text-white">
                         <h4>Historial de Compras</h4>
                     </div>
@@ -127,16 +126,15 @@
                                 </div>
                                 <div class="collapse" id="compra-{{ forloop.counter }}">
                                     <div class="card-body">
-                                        <p><strong>Estado:</strong> {{ venta.estado }}</p>
-                                        <p><strong>Cantidad de Productos:</strong> {{ venta.cantidad }}</p>
-                                        <p><strong>Método de Pago:</strong> {{ venta.metodo_pago }}</p>
-                                        <p><strong>Total:</strong> ${{ venta.precio_total|floatformat:0 }}</p>
-                                        <!-- Productos de la venta -->
+                                        <p class="mb-3"><strong>Estado:</strong> {{ venta.estado }}</p>
+                                        <p class="mb-3"><strong>Cantidad de Productos:</strong> {{ venta.cantidad }}</p>
+                                        <p class="mb-3"><strong>Método de Pago:</strong> {{ venta.metodo_pago }}</p>
+                                        <p class="mb-3"><strong>Total:</strong> ${{ venta.precio_total|floatformat:0 }}</p>
                                         <h5 class="mt-4">Productos incluidos:</h5>
                                         <div class="row">
                                             {% for producto in venta.productos %}
-                                                <div class="col-md-6">
-                                                    <div class="d-flex mb-3 p-3 border rounded bg-light">
+                                                <div class="col-md-6 mb-3">
+                                                    <div class="d-flex p-3 border rounded bg-light">
                                                         {% if producto.imagen %}
                                                             <img 
                                                                 src="{{ producto.imagen }}" 
@@ -150,7 +148,6 @@
                                                                 alt="Imagen no disponible" 
                                                                 style="width: 100px; height: 100px; object-fit: cover; margin-right: 20px;">
                                                         {% endif %}
-                                                        <!-- Detalles del producto a la derecha de la imagen -->
                                                         <div class="media-body">
                                                             <h6 class="mt-0"><strong>{{ producto.nombre }}</strong></h6>
                                                             <p class="mb-1"><strong>Cantidad:</strong> {{ producto.cantidad }}</p>
@@ -170,11 +167,6 @@
             </div>
         </div>
     </div>
-    
-    
-    
-    
-    
     
 
     <footer class="bg-dark text-white py-4">
